@@ -1,5 +1,5 @@
 import { RotateCcw } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { type MouseEvent, useMemo, useRef, useState } from 'react';
 
 interface DataPoint {
   id: number;
@@ -108,7 +108,7 @@ export function RegressionWorkbench() {
     setPoints(PRESETS[key].points);
   };
 
-  const handleSvgClick = (event: React.MouseEvent<SVGSVGElement>) => {
+  const handleSvgClick = (event: MouseEvent<SVGSVGElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const scaleX = SVG_W / rect.width;
     const scaleY = SVG_H / rect.height;
@@ -131,7 +131,7 @@ export function RegressionWorkbench() {
     ]);
   };
 
-  const handleRemovePoint = (e: React.MouseEvent, id: number) => {
+  const handleRemovePoint = (e: MouseEvent<SVGGElement>, id: number) => {
     e.stopPropagation();
     if (points.length <= 2) return;
     setPoints((prev) => prev.filter((p) => p.id !== id));
@@ -143,7 +143,9 @@ export function RegressionWorkbench() {
   const lineStart = { x: 0, y: yAt0 };
   const lineEnd = { x: 10, y: yAt10 };
 
-  const sign = stats.intercept >= 0 ? '+' : '-';
+  const safeSlope = Math.abs(stats.slope) < 0.005 ? 0 : stats.slope;
+  const safeIntercept = Math.abs(stats.intercept) < 0.005 ? 0 : stats.intercept;
+  const sign = safeIntercept >= 0 ? '+' : '-';
 
   return (
     <div className="flex h-full flex-col justify-between rounded-2xl border border-zinc-200 bg-white p-6">
@@ -337,7 +339,7 @@ export function RegressionWorkbench() {
         <div>
           <p className="text-xs text-zinc-500">Best-Fit Equation</p>
           <p className="mt-1 font-mono text-sm font-medium text-zinc-950 tabular-nums">
-            y = {stats.slope.toFixed(2)}x {sign} {Math.abs(stats.intercept).toFixed(2)}
+            y = {safeSlope.toFixed(2)}x {sign} {Math.abs(safeIntercept).toFixed(2)}
           </p>
         </div>
         <div>

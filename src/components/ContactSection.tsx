@@ -37,14 +37,17 @@ export function ContactSection({ onOpenResumeModal }: ContactSectionProps) {
     return `mailto:${RESUME_PROFILE.email}?subject=${subject}&body=${body}`;
   };
 
-  const handleComposeSubmit = (e: FormEvent) => {
+  const handleComposeSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!messageText.trim()) {
       setFormFeedback('Please enter a brief message before sending.');
       return;
     }
-    setFormFeedback('Opening your default email client with this draft.');
-    window.location.href = buildMailtoHref();
+    setFormFeedback('Opening your email client with this draft.');
+    const link = document.createElement('a');
+    link.href = buildMailtoHref();
+    link.rel = 'noopener noreferrer';
+    link.click();
   };
 
   return (
